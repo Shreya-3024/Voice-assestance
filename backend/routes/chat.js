@@ -1,13 +1,18 @@
 import express from 'express'
-import { callGemini } from '../services/gemini.js'
+import { callGemini, getGeminiErrorMessage } from '../services/gemini.js'
 import { salesSystemPrompt } from '../prompts/salesPrompt.js'
 
 export const chatRouter = express.Router()
 
 chatRouter.post('/chat', async (req, res) => {
   const { message, history = [] } = req.body
-  if (!message || typeof message !== 'string') {
+  if (typeof message !== 'string' || !message.trim() || message.length > 4000) {
     return res.status(400).json({ error: 'A valid customer message is required.' })
+  }
+  if (!Array.isArray(history) || history.length > 100 ||
+    history.some((item) => !item || !['assistant', 'user'].includes(item.role) ||
+      typeof item.content !== 'string' || !item.content.trim())) {
+    return res.status(400).json({ error: 'Conversation history must contain valid messages.' })
   }
 
   const contents = [
@@ -23,6 +28,6 @@ chatRouter.post('/chat', async (req, res) => {
     res.json({ reply })
   } catch (error) {
     console.error(error)
-    res.status(502).json({ error: 'The AI service could not respond. Please try again.' })
+    res.status(502).json({ error: getGeminiErrorMessage(error, 'AI response') })
   }
 })

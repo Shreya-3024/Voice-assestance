@@ -53,11 +53,13 @@ npm run dev
 ```
 Open `http://localhost:5173`. The backend runs at `http://localhost:3001`.
 
+To start both local services without opening VS Code, double-click `Start-SalesAI.bat` in the project folder. Keep the two PowerShell windows it opens running. For hosting that stays available without your computer running, follow the [deployment guide](./DEPLOYMENT.md).
+
 ## Gemini API configuration
 1. Create an API key in Google AI Studio.
 2. Put it only in `backend/.env`: `GEMINI_API_KEY=your_real_key`
 3. Never place the key in frontend code or commit `.env`.
-4. The backend tries `gemini-3.8-flash`, then falls back to `gemini-3.7-flash` and `gemini-3.5-flash` if the preferred model is unavailable.
+4. The backend prefers `gemini-3.5-flash-lite` and tries other Gemini Flash models if that model is unavailable or its quota is exhausted.
 
 ## Demo conversation
 - AI: “Hello! Welcome to TechNova Solutions. How can I help you today?”
@@ -70,19 +72,18 @@ Open `http://localhost:5173`. The backend runs at `http://localhost:3001`.
 ## GitHub commands
 ```powershell
 cd C:\Users\PS\Desktop\inter
-git init
 git add .
-git commit -m "Add complete SalesAI MVP"
-git branch -M main
-git remote add origin <your-github-repository-url>
-git push -u origin main
+git commit -m "Prepare SalesAI deployment"
+git push ghy main
 ```
+If Git reports there is nothing to commit, just run the push command.
 
 ## Documentation
 - [One-page project report](./PROJECT_REPORT.md)
 - [System architecture](./ARCHITECTURE.md)
 - [Scalability strategy](./SCALABILITY.md)
 - [Interview guide](./INTERVIEW_GUIDE.md)
+- [Deployment guide](./DEPLOYMENT.md)
 
 ## Security, deployment and costs
 Keep Gemini credentials in backend environment variables and use HTTPS in production. Obtain voice-processing consent, validate inputs, avoid unnecessary sensitive data, and use authentication and authorisation before storing real customer records. LocalStorage is browser-only and not suitable as secure business storage.
